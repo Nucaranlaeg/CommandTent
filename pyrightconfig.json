@@ -1,0 +1,10 @@
+{
+  "typeCheckingMode": "strict",
+  "reportMissingTypeStubs": false,
+  "reportMissingParameterType": true,
+  "reportMissingReturnType": true,
+  "reportUntypedFunctionDecorator": true,
+  "ignore": [
+    "**/test_*.py"
+  ]
+}
