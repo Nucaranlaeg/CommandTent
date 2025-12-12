@@ -1,0 +1,4 @@
+Tasks
+Fix performance issues with dragging.
+Draw more details within a command cell (e.g. trees, buildings, roads).
+Command tents should be placeable on a specific cell, not just a command cell.

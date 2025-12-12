@@ -4,6 +4,8 @@ from map.terrain import MAX_SIGHT, Terrain
 import re
 import inspect
 
+from map.generator import generate as generate_seeded
+
 # Extract terrain classes from the terrain_types module
 terrain_types: list[type[Terrain]] = [
 	getattr(terrain_module, attr) for attr in dir(terrain_module)
@@ -13,20 +15,64 @@ terrain_types: list[type[Terrain]] = [
 ]
 
 class Map:
-	def __init__(self, width: int, height: int):
+	def __init__(self, width: int, height: int, seed: Optional[int] = None):
 		self.width = width
 		self.height = height
-		self.generate_map()
+		self.generate_map(seed)
 
-	def generate_map(self) -> None:
+	def generate_map(self, seed: Optional[int] = None) -> None:
 		self.map: list[list[Terrain]] = []
+		if seed is not None:
+			self.map = generate_seeded(self.width, self.height, seed)
+			return
 		for y in range(self.height):
 			row: list[Terrain] = []
 			for x in range(self.width):
-				# Randomly select a terrain type
 				terrain_type: type[Terrain] = terrain_types[(x + y) % len(terrain_types)]
 				row.append(terrain_type(x, y))
 			self.map.append(row)
+
+	def command_cell_size(self) -> tuple[int, int]:
+		"""Return the size in base cells of each command cell (assumes 10x10 command grid)."""
+		return max(1, self.width // 10), max(1, self.height // 10)
+
+	def command_cell_bounds(self, cell: str) -> tuple[int, int, int, int]:
+		"""Compute inclusive [x0,y0] to inclusive [x1,y1] bounds for a command grid label like "D3" (A-J, 0-9)."""
+		if not cell or len(cell) < 2:
+			raise ValueError("Invalid command cell label")
+		col_letter = cell[0].upper()
+		if col_letter < 'A' or col_letter > 'J':
+			raise ValueError("Column out of range")
+		try:
+			row_idx = int(cell[1])
+		except ValueError:
+			raise ValueError("Row must be 0-9")
+		if row_idx < 0 or row_idx > 9:
+			raise ValueError("Row out of range")
+		col_idx = ord(col_letter) - ord('A')
+		cw, ch = self.command_cell_size()
+		x0 = col_idx * cw
+		y0 = row_idx * ch
+		x1 = min(self.width - 1, x0 + cw - 1)
+		y1 = min(self.height - 1, y0 + ch - 1)
+		return x0, y0, x1, y1
+
+	def choose_station_within_bounds(self, bounds: tuple[int, int, int, int], prefer: list[str] | None = None) -> tuple[float, float]:
+		"""Pick a station point within bounds, preferring terrain types (by class name) if provided. Returns subcell center coords (x+0.5, y+0.5)."""
+		x0, y0, x1, y1 = bounds
+		# Try preferred terrains in order
+		if prefer:
+			pref_set = [p.lower() for p in prefer]
+			for p in pref_set:
+				for y in range(y0, y1 + 1):
+					for x in range(x0, x1 + 1):
+						name = self.map[y][x].__class__.__name__.lower()
+						if p in name:
+							return x + 0.5, y + 0.5
+		# Fallback to approximate center of the command cell
+		cx = (x0 + x1) / 2.0
+		cy = (y0 + y1) / 2.0
+		return cx + 0.0, cy + 0.0
 
 	def find_cell(self, loc_string: str) -> Terrain:
 		"""
@@ -97,4 +143,5 @@ class Map:
 				y1 += sy
 		yield self.map[y2][x2]  # Yield the last cell
 
+# Keep a small default map for tests/examples
 game_map = Map(10, 10)

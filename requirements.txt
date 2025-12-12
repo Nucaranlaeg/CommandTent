@@ -1,0 +1,33 @@
+# Command Tent - Voice-Controlled Military Simulation Game
+# Core dependencies for the game engine and UI
+
+# Core game dependencies
+jsonschema==4.23.0
+PyYAML==6.0.2
+pygame==2.6.1
+
+# Speech-to-Text and Audio Processing
+faster-whisper==1.1.1
+openwakeword==0.6.0
+pvporcupine==1.9.5
+PyAudio==0.2.14
+realtimestt==0.3.104
+soundfile==0.13.1
+webrtcvad-wheels==2.0.14
+
+# Machine Learning (for STT)
+torch==2.7.0
+torchaudio==2.7.0
+numpy==2.2.5
+scipy==1.15.2
+scikit-learn==1.6.1
+
+# Utilities
+attrs==25.4.0
+colorama==0.4.6
+coloredlogs==15.0.1
+humanfriendly==10.0
+tqdm==4.67.1
+
+# Development and Testing
+pytest==8.3.5

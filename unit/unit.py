@@ -1,5 +1,16 @@
+from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
+
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import List, Optional, Tuple
+
+from map.terrain import Terrain
+from map.map import Map
+from map.pathfinding import astar
+from schemas.types import HealthState, Posture, ROE
+
 
 if TYPE_CHECKING:
 	from map.terrain import Terrain
@@ -78,3 +89,91 @@ class Armour(Unit):
 class Truck(Unit):
 	def __init__(self, name: str = "Halftrack") -> None:
 		super().__init__(name, health=500, attack=0, defense=5, vision=3, stealth=1, range=1, move_difficulty=4, movement=12)
+
+
+class UnitState(str, Enum):
+    IDLE = "idle"
+    MOVING = "moving"
+    DOWNED = "downed"
+
+
+@dataclass
+class Fireteam:
+    name: str
+    member_ids: List[str]
+    leader_id: str
+    cohesion_radius: int = 2  # in cells
+
+
+@dataclass
+class UnitModel:
+    unit_id: str
+    speed_cells_per_second: float
+    position: Tuple[float, float]
+    state: UnitState = UnitState.IDLE
+    path: List[Tuple[int, int]] = field(default_factory=list)
+    target: Optional[Tuple[int, int]] = None
+    fireteam_name: Optional[str] = None
+    is_leader: bool = False
+    move_progress: float = 0.0
+    health_state: HealthState = HealthState.HEALTHY
+    posture: Posture = Posture.STAND
+    roe: ROE = ROE.RETURN_FIRE
+    side: str = "A"
+
+    def _current_cell(self) -> Tuple[int, int]:
+        x, y = self.position
+        return int(x), int(y)
+
+    def _cell_center(self, cell: Tuple[int, int]) -> Tuple[float, float]:
+        cx, cy = cell
+        return cx + 0.5, cy + 0.5
+
+    def set_move_target(self, game_map: Map, goal: Tuple[int, int]) -> bool:
+        start_cell = self._current_cell()
+        p = astar(game_map, start_cell, goal)
+        if p is None or len(p) <= 1:
+            return False
+        self.path = p[1:]
+        self.target = goal
+        self.state = UnitState.MOVING
+        return True
+
+    def tick_move(self, dt: float) -> None:
+        if self.state != UnitState.MOVING or not self.path:
+            return
+        remaining = self.speed_cells_per_second * dt
+        while remaining > 1e-6 and self.path:
+            target_center = self._cell_center(self.path[0])
+            x, y = self.position
+            tx, ty = target_center
+            dx = tx - x
+            dy = ty - y
+            dist = (dx * dx + dy * dy) ** 0.5
+            if dist <= remaining:
+                self.position = (tx, ty)
+                self.path.pop(0)
+                remaining -= dist
+            else:
+                if dist > 0:
+                    ux = dx / dist
+                    uy = dy / dist
+                    self.position = (x + ux * remaining, y + uy * remaining)
+                remaining = 0.0
+        if not self.path:
+            self.state = UnitState.IDLE
+            self.target = None
+            self.move_progress = 0.0
+
+
+def enforce_cohesion(leader: UnitModel, follower: UnitModel) -> None:
+    if leader.fireteam_name != follower.fireteam_name or leader.fireteam_name is None:
+        return
+    lx, ly = leader.position
+    fx, fy = follower.position
+    dx = abs(lx - fx)
+    dy = abs(ly - fy)
+    if max(dx, dy) >= 2:
+        step_x = 1 if lx > fx else -1 if lx < fx else 0
+        step_y = 1 if ly > fy else -1 if ly < fy else 0
+        follower.position = (fx + step_x, fy + step_y)

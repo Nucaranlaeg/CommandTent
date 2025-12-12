@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commandtent/schema/order.schema.json",
+  "title": "Order",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "units": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1
+    },
+    "intent": {
+      "type": "string",
+      "enum": [
+        "move",
+        "hold",
+        "attack",
+        "observe",
+        "support",
+        "retreat",
+        "cancel"
+      ]
+    },
+    "waypoints": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "pattern": "^[A-J](?:[0-9])$",
+            "description": "Command cell coordinate (e.g., A1, B2)"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "commandCell": {
+                "type": "string",
+                "pattern": "^[A-J](?:[0-9])$"
+              },
+              "subcell": {
+                "type": "object",
+                "properties": {
+                  "x": { "type": "integer", "minimum": 0, "maximum": 99 },
+                  "y": { "type": "integer", "minimum": 0, "maximum": 99 }
+                },
+                "required": ["x", "y"]
+              }
+            },
+            "required": ["commandCell", "subcell"],
+            "description": "Precise subcell coordinate within a command cell"
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "preferTerrain": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["road", "open", "forest", "building"]
+          },
+          "uniqueItems": true
+        },
+        "avoidCells": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-J](?:[0-9])$" },
+          "uniqueItems": true
+        },
+        "stayConcealed": { "type": "boolean" },
+        "speed": { "type": "string", "enum": ["slow", "normal", "fast"] }
+      }
+    },
+    "roe": { "type": "string", "enum": ["hold", "return_fire", "free"] },
+    "posture": { "type": "string", "enum": ["stand", "crouch", "prone"] },
+    "engagement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "targetCells": {
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[A-J](?:[0-9])$" },
+          "uniqueItems": true
+        },
+        "suppressOnly": { "type": "boolean" }
+      }
+    },
+    "priority": { "type": "string", "enum": ["low", "normal", "high"] },
+    "ack": { "type": "boolean" }
+  },
+  "required": ["units", "intent"]
+}

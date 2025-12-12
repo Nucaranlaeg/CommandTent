@@ -1,0 +1,10 @@
+# Rules of Engagement (MVP)
+
+hold:
+  description: Do not fire under any circumstances.
+
+return_fire:
+  description: Only fire when fired upon or fired at visible enemies that have fired.
+
+free:
+  description: Fire on any valid enemy target within range and ROE.

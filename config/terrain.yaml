@@ -1,0 +1,36 @@
+# Terrain configuration (MVP)
+
+road:
+  movement_multiplier: 0.7
+  concealment: 0.0
+  cover: 0.0
+  walkable: true
+  blocks_los: false
+
+open:
+  movement_multiplier: 1.0
+  concealment: 0.1
+  cover: 0.0
+  walkable: true
+  blocks_los: false
+
+forest:
+  movement_multiplier: 1.4
+  concealment: 0.6
+  cover: 0.3
+  walkable: true
+  blocks_los: true
+
+building:
+  movement_multiplier: 1.6
+  concealment: 0.7
+  cover: 0.6
+  walkable: true
+  blocks_los: true
+
+water:
+  movement_multiplier: 9.9
+  concealment: 0.0
+  cover: 0.0
+  walkable: false
+  blocks_los: false
