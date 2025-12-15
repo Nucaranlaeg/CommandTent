@@ -62,6 +62,36 @@ interface Order {
     };
   };
 
+  RulesOfEngagement: {
+    /**
+     * When the unit is allowed to fire.
+     * Units may return fire if fired upon regardless of orders if the fire is accurate enough.
+     */
+    fireControl: "Hold" | "Return fire" | "Fire at will" | "Suppress";
+
+    /**
+     * Which unit(s) to target.
+     */
+    target?: "Any" | Cell;
+  };
+
+  Reporting: {
+    // When order is complete - default false
+    complete?: boolean;
+
+    // When enemy units are seen - default true
+    contact?: boolean;
+
+    // When nearby allies are injured - default true
+    injury?: boolean;
+
+    // When eliminating enemy units - default true
+    elimination?: boolean;
+
+    // Every x seconds, undefined meaning no timed check in
+    periodic?: number;
+  };
+
   Start:
     | "No other orders"
     | "Immediately"
