@@ -50,6 +50,7 @@ class CommandTentUI:
         stt_engine = STTEngine(stt_config, self._on_transcript)
         tts_config = TTSConfig(mode="simulated")
         tts_engine = TTSEngine(tts_config, None)
+        # Uses config/llm.yaml; optional COMMANDTENT_LLM_GGUF to pin a local .gguf
         parser = LLMCommandParser()
         
         self.voice_ux = VoiceUX(stt_engine, parser, self.game.executor)

@@ -1,0 +1,29 @@
+# Default command LLM (GGUF). Edit here or override with environment variables.
+#
+# Environment overrides (optional):
+#   COMMANDTENT_LLM_GGUF           Absolute path to a .gguf file (skips Hugging Face download)
+#   COMMANDTENT_LLM_HF_REPO        Override huggingface.repo_id
+#   COMMANDTENT_LLM_HF_FILE        Override huggingface.filename
+#   COMMANDTENT_LLM_CACHE_DIR      Override cache.directory (absolute or project-relative)
+#   COMMANDTENT_LLM_MIN_FILE_BYTES Treat existing file as valid only if at least this many bytes
+#   COMMANDTENT_LLM_N_CTX          Context size (default below)
+#   COMMANDTENT_LLM_N_GPU_LAYERS   GPU layers for llama.cpp (0 = CPU only)
+#   COMMANDTENT_LLM_N_THREADS      Thread count for llama.cpp
+#   COMMANDTENT_LLM_MAX_TOKENS     Max new tokens per completion
+#   COMMANDTENT_LLM_TEMPERATURE    Sampling temperature
+#   COMMANDTENT_LLM_VERBOSE        true / 1 to enable llama.cpp verbose logging
+
+huggingface:
+  repo_id: bartowski/Qwen_Qwen3.5-4B-GGUF
+  filename: Qwen_Qwen3.5-4B-Q4_K_M.gguf
+
+cache:
+  # Relative to the project root unless an absolute path
+  directory: .cache/llm
+
+inference:
+  n_ctx: 4096
+  n_gpu_layers: 0
+  max_tokens: 512
+  temperature: 0.1
+  verbose: false

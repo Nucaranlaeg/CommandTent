@@ -1,7 +1,6 @@
 from client.ui.map_view import MapView, UIConfig
 from client.ui.command_panel import CommandPanel, StatusPanel
 from client.audio.stt import STTEngine, STTConfig, VoiceUX
-from server.orders.llm_parser import LLMCommandParser
 from map.map import Map
 from map.generator import generate
 from unit.unit import UnitModel
@@ -19,12 +18,11 @@ def test_map_view_creation():
     assert not map_view.running
 
 
-def test_command_panel_creation():
+def test_command_panel_creation(command_llm_parser):
     """Test CommandPanel can be created."""
     stt_config = STTConfig()
     stt_engine = STTEngine(stt_config, lambda text: None)
-    parser = LLMCommandParser()
-    voice_ux = VoiceUX(stt_engine, parser, None)
+    voice_ux = VoiceUX(stt_engine, command_llm_parser, None)
     
     panel = CommandPanel(0, 0, 400, 300, voice_ux)
     

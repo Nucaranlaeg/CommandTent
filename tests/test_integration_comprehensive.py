@@ -15,13 +15,12 @@ from typing import Dict, List
 
 from server.game.engine import Game, GameConfig
 from unit.unit import UnitModel
-from server.orders.llm_parser import LLMCommandParser
 from client.audio.stt import STTEngine, STTConfig, VoiceUX
 from client.audio.tts import TTSEngine, TTSConfig, VoiceRadioSystem
 from schemas.validate import validate_order
 
 
-def test_full_system_integration():
+def test_full_system_integration(command_llm_parser):
     """Test the complete system integration with all components."""
     print("Testing full system integration...")
     
@@ -54,10 +53,8 @@ def test_full_system_integration():
     stt_engine = STTEngine(stt_config, lambda x: None)
     tts_config = TTSConfig(mode="simulated")
     tts_engine = TTSEngine(tts_config, None)
-    parser = LLMCommandParser()
-    
-    voice_ux = VoiceUX(stt_engine, parser, game.executor)
-    voice_radio = VoiceRadioSystem(stt_engine, tts_engine, parser, game.executor)
+    _voice_ux = VoiceUX(stt_engine, command_llm_parser, game.executor)
+    _voice_radio = VoiceRadioSystem(stt_engine, tts_engine, command_llm_parser, game.executor)
     
     # 4. Test complex order execution
     complex_orders = [

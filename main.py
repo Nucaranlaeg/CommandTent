@@ -3,6 +3,8 @@ from typing import Any
 from RealtimeSTT import AudioToTextRecorder
 from map.map import game_map
 
+from time import time
+
 def process_text(text: str) -> None:
 	print(f"Received text: {text}")
 	for word in text.split():
@@ -15,7 +17,10 @@ def process_text(text: str) -> None:
 			pass
 
 if __name__ == '__main__':
+	start_time = time()
 	recorder: Any = AudioToTextRecorder()
+	end_time = time()
+	print(f"Time taken to initialize: {end_time - start_time} seconds")
 	print("Game is ready!")
 	try:
 		while True:

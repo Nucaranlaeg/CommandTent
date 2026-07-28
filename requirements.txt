@@ -29,5 +29,9 @@ coloredlogs==15.0.1
 humanfriendly==10.0
 tqdm==4.67.1
 
+# Local command LLM (see config/llm.yaml; GGUF via llama-cpp-python + Hugging Face download)
+llama-cpp-python @ git+https://github.com/JamePeng/llama-cpp-python@main
+huggingface_hub>=0.26.0
+
 # Development and Testing
 pytest==8.3.5

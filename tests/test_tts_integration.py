@@ -1,6 +1,5 @@
 from client.audio.tts import TTSConfig, TTSMode, TTSEngine, RadioResponseGenerator, VoiceRadioSystem
 from client.audio.stt import STTEngine, STTConfig, VoiceUX
-from server.orders.llm_parser import LLMCommandParser
 
 
 def test_tts_engine_creation():
@@ -52,16 +51,15 @@ def test_tts_simulation():
     assert "Red acknowledging" in output
 
 
-def test_voice_radio_system():
+def test_voice_radio_system(command_llm_parser):
     """Test complete voice radio system."""
     stt_config = STTConfig()
     stt_engine = STTEngine(stt_config, lambda text: None)
     tts_config = TTSConfig(mode=TTSMode.SIMULATED)
     generator = RadioResponseGenerator()
     tts_engine = TTSEngine(tts_config, generator)
-    parser = LLMCommandParser()
     
-    voice_radio = VoiceRadioSystem(stt_engine, tts_engine, parser, None)
+    voice_radio = VoiceRadioSystem(stt_engine, tts_engine, command_llm_parser, None)
     
     # Test radio event processing
     import io
@@ -76,16 +74,15 @@ def test_voice_radio_system():
     assert "Red" in output
 
 
-def test_simulate_unit_responses():
+def test_simulate_unit_responses(command_llm_parser):
     """Test simulating multiple unit responses."""
     stt_config = STTConfig()
     stt_engine = STTEngine(stt_config, lambda text: None)
     tts_config = TTSConfig(mode=TTSMode.SIMULATED)
     generator = RadioResponseGenerator()
     tts_engine = TTSEngine(tts_config, generator)
-    parser = LLMCommandParser()
     
-    voice_radio = VoiceRadioSystem(stt_engine, tts_engine, parser, None)
+    voice_radio = VoiceRadioSystem(stt_engine, tts_engine, command_llm_parser, None)
     
     # Simulate radio events
     events = [
